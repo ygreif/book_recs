@@ -13,27 +13,32 @@ def df(file):
     return df
 
 class BookDataset(Dataset):
-    def __init__(self, file, transform=None, target_transform=None):
-        self._data = df(file)
-        user_id_encoder = LabelEncoder()
-        book_id_encoder = LabelEncoder()
-        self._data['User_id'] = user_id_encoder.fit_transform(self._data['User_id'])
-        self._data['Id'] = book_id_encoder.fit_transform(self._data['Id'])
+    def __init__(self, file, transform=None, target_transform=None, encode=False):
+        _data = df(file)
+        if encode:
+            user_id_encoder = LabelEncoder()
+            book_id_encoder = LabelEncoder()
+            _data['User_id'] = user_id_encoder.fit_transform(_data['User_id'])
+            _data['Id'] = book_id_encoder.fit_transform(_data['Id'])
+            self.num_users = len(user_id_encoder.classes_)
+            self.num_books = len(book_id_encoder.classes_)
+        else:
+            self.num_users = _data['User_id'].nunique()
+            self.num_books = _data['Id'].nunique()
 
-        self.num_users = len(user_id_encoder.classes_)
-        self.num_books = len(book_id_encoder.classes_)
+        self._len = len(_data)
 
-        self._ids = torch.tensor(self._data['Id'].values, dtype=torch.int64)
-        self._user_ids = torch.tensor(self._data['User_id'].values, dtype=torch.int64)
-        self._times = torch.tensor(self._data['review/time'].values, dtype=torch.int64)
-        self._scores = torch.tensor(self._data['review/score'].values, dtype=torch.int8)
+        self._ids = torch.tensor(_data['Id'].values, dtype=torch.int64)
+        self._user_ids = torch.tensor(_data['User_id'].values, dtype=torch.int64)
+        self._times = torch.tensor(_data['review/time'].values, dtype=torch.int64)
+        self._scores = torch.tensor(_data['review/score'].values, dtype=torch.int8)
 
 
         self._transform = transform
         self._target_transform = target_transform
 
     def __len__(self):
-        return len(self._data)
+        return self._len
 
     def __getitem__(self, idx):
         features = (self._ids[idx], self._user_ids[idx], self._times[idx])
