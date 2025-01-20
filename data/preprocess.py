@@ -26,7 +26,7 @@ def preprocess(input, output):
     df['User_id'] = user_id_encoder.fit_transform(df['User_id'])
     df['Id'] = book_id_encoder.fit_transform(df['Id'])
 
-    df.to_csv('./data/books_rating_encoded.csv', index=False)
+    df.to_csv(output, index=False)
 
     train_df, test_df, val_df = data.split_pd(df)
     train_df = transform_singleton_users(train_df)
@@ -41,7 +41,7 @@ def preprocess(input, output):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("input")
-#    parser.add_argument("output")
+    parser.add_argument("output")
     args = parser.parse_args()
 
     preprocess(args.input, args.output)
