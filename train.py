@@ -159,7 +159,7 @@ def generate_hidden_layers(embedding_size, structure):
 
 def run_ray(device, train_dset_id, test_dset_id):
     config = {
-        'embedding_size': tune.choice([128, 256, 512]),
+        'embedding_size': tune.choice([32, 64, 128, 256]),
         'structure': tune.choice(['three', 'two', 'two_large', 'one', 'one_large']),
         'hidden_layers': tune.sample_from(lambda spec: generate_hidden_layers(spec.config.embedding_size, spec.config.structure)),
 #        'hidden_layers': tune.choice([[512, 256], [128], [128, 128] ]),
